@@ -5,8 +5,18 @@
     <script src="game.js"></script>
 </head>
 <body>
-<script>
-convertShipPlacementToGrid(parseShipPlacement("A:A10-A1;B:B10-E10; S:H3-J3"));
-</script>
+    <script>
+        var player1 = getInfo(1);
+        while (player1 == null) {
+            alert("You entered invalid data");
+            player1 = getInfo(1);
+        }
+        
+        var player2 = getInfo(2);
+        while (player2 == null) {
+            alert("You entered invalid data");
+            player2 = getInfo(2);
+        }
+    </script>
 </body>
 </html>

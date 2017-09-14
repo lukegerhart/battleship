@@ -1,4 +1,7 @@
 function validateShipPlacement(ships) {    
+    if (ships == null) {
+        return false;
+    }
     //check that they're the right length
     if(ships["A"].length != 5 || ships["B"].length != 4 || ships["S"].length != 3) {
         return false;
@@ -13,6 +16,9 @@ function validateShipPlacement(ships) {
 }
 
 function convertShipPlacementToGrid(placementArray) {
+    if (placementArray == null) {
+        return null;
+    }
     var letterMap = {'A':1, 'B':2, 'C':3, 'D':4, 'E':5, 'F':6, 'G':7, 'H':8, 'I':9, 'J':10};
     var ships = {};
     for (var i = 0; i < placementArray.length; i++) {
@@ -68,10 +74,13 @@ function parseShipPlacement(placementStr) {
 		document.write(matches[0]);
         ships.push(matches[0]);
     } */
+    if (placementStr == null) {
+        return null;
+    }
 	var ships = [];
 	placementStr = placementStr.replace(/\s+/g, '');
 	if (placementStr.charAt(placementStr.length-1) == ";") {
-		placementStr = placementStr.substring(0,placementStr.length);
+		placementStr = placementStr.substring(0,placementStr.length-1);
 	}
 	ships = placementStr.split(";");
 	if (ships.length != 3) {
@@ -79,7 +88,7 @@ function parseShipPlacement(placementStr) {
     }
 	for (var i = 0; i < ships.length; i++) {
 		ships[i] = ships[i].replace(/[(]|[)]|;|:/g, '');
-        if (ships[i].length != 6 || ships[i] != 7) {
+        if (ships[i].length != 6 && ships[i].length != 7) {
             return null;
         }
         if ( !["A", "B", "S"].contains(ships[i].charAt(0)) ) {
@@ -87,4 +96,21 @@ function parseShipPlacement(placementStr) {
         }
 	}
     return ships;
+}
+
+function generateGrid() {
+    
+}
+
+function getInfo(playerNum) {
+    var name = prompt("Player" + playerNum +  ", please enter your name", "Player1");
+    var shipPlacement = prompt(name + ", please enter your ship placement");
+
+    var shipPlacements = parseShipPlacement(shipPlacement);
+    var shipPlacementGrid = convertShipPlacementToGrid(shipPlacements);
+    if (!validateShipPlacement(shipPlacementGrid)) {
+        return null;
+    }
+    var playerInfo = {"name": name, "playerNum": playerNum, "shipPlacement": shipPlacementGrid};
+    return playerInfo;
 }
