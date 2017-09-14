@@ -1,0 +1,26 @@
+.grid {
+    padding: 0;
+    margin: auto;   
+    display: block;
+    width: 800px;
+    height: 500px;
+    border: 10px solid #000000; 
+    background-color: #66B3FF;
+}
+
+.cell {
+    padding: 0px;
+    margin: auto;
+    width: 79px;
+    height: 49px;
+    border-right: 1px solid #000000;
+    display: inline-block;
+}
+
+.row {
+  border-bottom: 1px solid #000000;
+  padding: 0;
+  margin: 0;
+  height: 49px;
+  width: 800px;
+}
