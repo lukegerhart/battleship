@@ -3,10 +3,12 @@
 <head>
 	<title>Battleship</title>
     <script src="game.js"></script>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
 </head>
 <body>
     <script>
-        var player1 = getInfo(1);
+        
+        /*var player1 = getInfo(1);
         while (player1 == null) {
             alert("You entered invalid data");
             player1 = getInfo(1);
@@ -16,7 +18,16 @@
         while (player2 == null) {
             alert("You entered invalid data");
             player2 = getInfo(2);
-        }
+        }*/
+    </script>
+    <div id="container">
+        <!--This is the main container for the 2 grids-->
+    </div>
+    <script>
+        
+        var container = document.getElementById("container");
+        container.appendChild(generateGrid("playerNum1"));
+        container.appendChild(generateGrid("playerNum2"));
     </script>
 </body>
 </html>

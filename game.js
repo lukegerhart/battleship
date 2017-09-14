@@ -91,19 +91,32 @@ function parseShipPlacement(placementStr) {
         if (ships[i].length != 6 && ships[i].length != 7) {
             return null;
         }
-        if ( !["A", "B", "S"].contains(ships[i].charAt(0)) ) {
+        if ( ships[i].charAt(0) != 'A' && ships[i].charAt(0) != 'B' && ships[i].charAt(0) != 'S' ) {
             return null;
         }
 	}
     return ships;
 }
 
-function generateGrid() {
-    
+function generateGrid(playerNum) {
+    var gridDiv = document.createElement("div");
+    gridDiv.className = "grid";
+    for (var row = 0; row < 10; row++) {
+        var rowDiv = document.createElement("div");
+        rowDiv.className = "row";
+        for (var col = 1; col <= 10; col++) {
+            var cellDiv = document.createElement("div");
+            cellDiv.id = playerNum + "cell" + (row*10+col);
+            cellDiv.className = "cell";
+            rowDiv.appendChild(cellDiv);
+        }
+        gridDiv.appendChild(rowDiv);
+    }
+    return gridDiv;
 }
 
 function getInfo(playerNum) {
-    var name = prompt("Player" + playerNum +  ", please enter your name", "Player1");
+    var name = prompt("Player" + playerNum +  ", please enter your name", "Player" + playerNum);
     var shipPlacement = prompt(name + ", please enter your ship placement");
 
     var shipPlacements = parseShipPlacement(shipPlacement);
@@ -111,6 +124,6 @@ function getInfo(playerNum) {
     if (!validateShipPlacement(shipPlacementGrid)) {
         return null;
     }
-    var playerInfo = {"name": name, "playerNum": playerNum, "shipPlacement": shipPlacementGrid};
+    var playerInfo = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid};
     return playerInfo;
 }
