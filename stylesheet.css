@@ -1,11 +1,35 @@
+.columnLabel {
+    margin: auto;
+    width: 820px;
+    height: 50px;
+    padding: 0;
+}
+
+.rowLabelAndGrid {
+    margin: auto;
+    width: 820px;
+    height: auto;
+    padding: 0;
+}
+
+.rowLabel {
+    display: inline-block;
+    margin-bottom: auto;
+    margin-top: auto;
+    margin-left: auto;
+    margin-right: 0;
+    width: 50px;
+    height: 520px;
+    padding: 0;
+}
+
 .grid {
     padding: 0;
-    margin: auto;   
-    display: block;
+    margin: auto;
+    display: inline-block;
     width: 800px;
     height: 500px;
-    border: 10px solid #000000; 
-    background-color: #66B3FF;
+    border: 10px solid #000000;
 }
 
 .cell {
@@ -17,10 +41,24 @@
     display: inline-block;
 }
 
+.blueBackground {
+    background-color: #66B3FF;
+}
+
+.redBackground {
+    background-color: firebrick;
+}
 .row {
-  border-bottom: 1px solid #000000;
-  padding: 0;
-  margin: 0;
-  height: 49px;
-  width: 800px;
+    border-bottom: 1px solid #000000;
+    padding: 0;
+    margin: 0;
+    height: 49px;
+    width: 800px;
+}
+
+.shipType {
+    text-align: center;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
 }

@@ -7,8 +7,7 @@
 </head>
 <body>
     <script>
-        
-        /*var player1 = getInfo(1);
+       /* var player1 = getInfo(1);
         while (player1 == null) {
             alert("You entered invalid data");
             player1 = getInfo(1);
@@ -19,15 +18,10 @@
             alert("You entered invalid data");
             player2 = getInfo(2);
         }*/
-    </script>
-    <div id="container">
-        <!--This is the main container for the 2 grids-->
-    </div>
-    <script>
-        
-        var container = document.getElementById("container");
-        container.appendChild(generateGrid("playerNum1"));
-        container.appendChild(generateGrid("playerNum2"));
+        var player1 = {"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":[52]};
+        var player2 = {"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":[52]};
+        generateTopGrid(player2);
+        generateBottomGrid(player1);
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@ function validateShipPlacement(ships) {
         return false;
     }
     //check that they're the right length
-    if(ships["A"].length != 5 || ships["B"].length != 4 || ships["S"].length != 3) {
+    if (ships["A"].length != 5 || ships["B"].length != 4 || ships["S"].length != 3) {
         return false;
     }
     //check that they don't overlap
@@ -63,6 +63,15 @@ function convertShipPlacementToGrid(placementArray) {
     return ships;
 }
 
+function contains(array, item) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] == item) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function parseShipPlacement(placementStr) {
     //This regexp matches acceptable input for ship placement. Regexp does not check that the placement is valid(i.e. 4-cell submarine is allowed)
     /* var shipPlacementRegex = new RegExp('[ABS][:(][A-J](?:[1-9]|10)-[A-J](?:[1-9]|10)[)]?;?', 'g');
@@ -91,14 +100,60 @@ function parseShipPlacement(placementStr) {
         if (ships[i].length != 6 && ships[i].length != 7) {
             return null;
         }
-        if ( ships[i].charAt(0) != 'A' && ships[i].charAt(0) != 'B' && ships[i].charAt(0) != 'S' ) {
+        if ( !contains(['A', 'B', 'S'], ships[i].charAt(0))) {
             return null;
         }
 	}
     return ships;
 }
 
-function generateGrid(playerNum) {
+function generateTopGrid(playerInfo) {
+    var body = document.body;
+    var container = document.createElement("div");
+    var columnLabel = document.createElement("div");
+    columnLabel.className = "columnLabel";
+    container.appendChild(columnLabel);
+    
+    var rowLabel = document.createElement("div");
+    rowLabel.className = "rowLabel";
+    
+    var rowLabelAndGrid = document.createElement("div");
+    rowLabelAndGrid.className = "rowLabelAndGrid";
+    rowLabelAndGrid.appendChild(rowLabel);
+    var gridDiv = document.createElement("div");
+    gridDiv.className = "grid";  
+    for (var row = 0; row < 10; row++) {
+        var rowDiv = document.createElement("div");
+        rowDiv.className = "row";
+        for (var col = 1; col <= 10; col++) {
+            var cellDiv = document.createElement("div");
+            var cellNum = (row*10+col);
+            cellDiv.id = playerInfo["playerNum"] + "cell" + cellNum;
+            var classname = "cell" + ((contains(playerInfo["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
+            cellDiv.className = classname;
+            rowDiv.appendChild(cellDiv);
+        }
+        gridDiv.appendChild(rowDiv);
+    }
+    rowLabelAndGrid.appendChild(gridDiv);
+    container.appendChild(rowLabelAndGrid);
+    body.appendChild(container);
+    //return gridDiv;
+}
+
+function determineShipType(ships, cellNum) {
+    var shipType = ""; //apparently every cell needs something or else the format gets all out of wack.
+    if (contains(ships['B'], cellNum)) {
+        shipType = 'B';
+    } else if (contains(ships['A'], cellNum)) {
+        shipType = 'A';
+    } else if (contains(ships['S'], cellNum)) {
+        shipType = 'S';
+    }
+    return shipType;
+}
+
+function generateBottomGrid(playerInfo) {
     var gridDiv = document.createElement("div");
     gridDiv.className = "grid";
     for (var row = 0; row < 10; row++) {
@@ -106,8 +161,18 @@ function generateGrid(playerNum) {
         rowDiv.className = "row";
         for (var col = 1; col <= 10; col++) {
             var cellDiv = document.createElement("div");
-            cellDiv.id = playerNum + "cell" + (row*10+col);
-            cellDiv.className = "cell";
+            var cellNum = (row*10+col);
+            cellDiv.id = playerInfo["playerNum"] + "cell" + cellNum;
+            var classname = "cell" + ((contains(playerInfo["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
+            cellDiv.className = classname;
+            //Label ship type
+            var ships = playerInfo["shipPlacement"];
+            var shipType = determineShipType(ships, cellNum);
+            var p = document.createElement("p");
+            p.className = "shipType";
+            var node = document.createTextNode(shipType);
+            p.appendChild(node);
+            cellDiv.appendChild(p);
             rowDiv.appendChild(cellDiv);
         }
         gridDiv.appendChild(rowDiv);
@@ -124,6 +189,6 @@ function getInfo(playerNum) {
     if (!validateShipPlacement(shipPlacementGrid)) {
         return null;
     }
-    var playerInfo = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid};
+    var playerInfo = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":[]};
     return playerInfo;
 }
