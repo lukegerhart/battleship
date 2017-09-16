@@ -108,37 +108,49 @@ function parseShipPlacement(placementStr) {
 }
 
 function generateTopGrid(playerInfo) {
+    var numToString = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     var body = document.body;
     var container = document.createElement("div");
-    var columnLabel = document.createElement("div");
-    columnLabel.className = "columnLabel";
-    container.appendChild(columnLabel);
-    
-    var rowLabel = document.createElement("div");
-    rowLabel.className = "rowLabel";
-    
-    var rowLabelAndGrid = document.createElement("div");
-    rowLabelAndGrid.className = "rowLabelAndGrid";
-    rowLabelAndGrid.appendChild(rowLabel);
     var gridDiv = document.createElement("div");
-    gridDiv.className = "grid";  
-    for (var row = 0; row < 10; row++) {
+    gridDiv.className = "topGrid";  
+    for (var row = 0; row < 11; row++) {
         var rowDiv = document.createElement("div");
         rowDiv.className = "row";
-        for (var col = 1; col <= 10; col++) {
+        for (var col = 0; col < 11; col++) {
             var cellDiv = document.createElement("div");
-            var cellNum = (row*10+col);
-            cellDiv.id = playerInfo["playerNum"] + "cell" + cellNum;
-            var classname = "cell" + ((contains(playerInfo["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
-            cellDiv.className = classname;
+            if (row == 0) {
+                var p = document.createElement("p");
+                p.className = "columnLabel";
+                var node = document.createTextNode(numToString[col]);
+                p.appendChild(node);
+                cellDiv.appendChild(p);
+                cellDiv.className = "cell";
+            } else if (col == 0) {
+                var p = document.createElement("p");
+                p.className = "rowLabel";
+                var node = document.createTextNode(row);
+                p.appendChild(node);
+                cellDiv.appendChild(p);
+                cellDiv.className = "cell";
+            } else {
+                var p = document.createElement("p");
+                p.className = "rowLabel";
+                var node = document.createTextNode("");
+                p.appendChild(node);
+                cellDiv.appendChild(p); 
+                var cellNum = ((row-1)*10+(col));
+                cellDiv.id = playerInfo["playerNum"] + "cell" + cellNum;
+                var classname = "cell" + ((contains(playerInfo["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
+                cellDiv.className = classname;
+            }
+            
+            
             rowDiv.appendChild(cellDiv);
         }
         gridDiv.appendChild(rowDiv);
     }
-    rowLabelAndGrid.appendChild(gridDiv);
-    container.appendChild(rowLabelAndGrid);
+    container.appendChild(gridDiv);
     body.appendChild(container);
-    //return gridDiv;
 }
 
 function determineShipType(ships, cellNum) {
@@ -153,31 +165,60 @@ function determineShipType(ships, cellNum) {
     return shipType;
 }
 
+
+
 function generateBottomGrid(playerInfo) {
+    var numToString = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    var body = document.body;
+    var container = document.createElement("div");
     var gridDiv = document.createElement("div");
-    gridDiv.className = "grid";
-    for (var row = 0; row < 10; row++) {
+    gridDiv.className = "bottomGrid";
+    for (var row = 0; row < 11; row++) {
         var rowDiv = document.createElement("div");
         rowDiv.className = "row";
-        for (var col = 1; col <= 10; col++) {
+        for (var col = 0; col < 11; col++) {
             var cellDiv = document.createElement("div");
-            var cellNum = (row*10+col);
-            cellDiv.id = playerInfo["playerNum"] + "cell" + cellNum;
-            var classname = "cell" + ((contains(playerInfo["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
-            cellDiv.className = classname;
-            //Label ship type
-            var ships = playerInfo["shipPlacement"];
-            var shipType = determineShipType(ships, cellNum);
-            var p = document.createElement("p");
-            p.className = "shipType";
-            var node = document.createTextNode(shipType);
-            p.appendChild(node);
-            cellDiv.appendChild(p);
+            if (row == 0) {
+                var p = document.createElement("p");
+                p.className = "columnLabel";
+                var node = document.createTextNode(numToString[col]);
+                p.appendChild(node);
+                cellDiv.appendChild(p);
+                cellDiv.className = "cell";
+            } else if (col == 0) {
+                var p = document.createElement("p");
+                p.className = "rowLabel";
+                var node = document.createTextNode(row);
+                p.appendChild(node);
+                cellDiv.appendChild(p);
+                cellDiv.className = "cell";
+            } else {
+                var p = document.createElement("p");
+                p.className = "rowLabel";
+                var node = document.createTextNode("");
+                p.appendChild(node);
+                cellDiv.appendChild(p); 
+                var cellNum = ((row-1)*10+(col));
+                cellDiv.id = playerInfo["playerNum"] + "cell" + cellNum;
+                var classname = "cell" + ((contains(playerInfo["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
+                cellDiv.className = classname;
+                //Label ship type
+                var ships = playerInfo["shipPlacement"];
+                var shipType = determineShipType(ships, cellNum);
+                var pShip = document.createElement("p");
+                pShip.className = "shipType";
+                var node = document.createTextNode(shipType);
+                pShip.appendChild(node);
+                cellDiv.appendChild(pShip);
+            }
+            
             rowDiv.appendChild(cellDiv);
         }
         gridDiv.appendChild(rowDiv);
     }
-    return gridDiv;
+    container.appendChild(gridDiv);
+    body.appendChild(container);
+    
 }
 
 function getInfo(playerNum) {
