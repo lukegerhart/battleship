@@ -1,5 +1,5 @@
-var player1Info = {"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":[]};
-var player2Info = {"name": "Bob", "playerNum": "playerNum2", "shipPlacement": {'B': [47, 57, 67, 77], 'S': [92, 93, 94], 'A': [23, 24, 25, 26, 27]}, "shipsHit":[]};
+var player1Info = {"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
+var player2Info = {"name": "Bob", "playerNum": "playerNum2", "shipPlacement": {'B': [47, 57, 67, 77], 'S': [92, 93, 94], 'A': [23, 24, 25, 26, 27]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
 var currentPlayer = {};
 var otherPlayer = {};
 
@@ -124,21 +124,36 @@ function parseShipPlacement(placementStr) {
     return ships;
 }
 
+function checkShipSunk(ships, cellNum) {
+    var hitsPerShip = {'A':5, 'B':4, 'S':3};
+    var shipName = {'A':'Aircraft Carrier', 'B':'Battleship', 'S':'Submarine'};
+    var shipType = determineShipType(ships, cellNum);
+    var hits = hitsPerShip[shipType];
+    if (otherPlayer["shipsHit"][shipType].length == hits) {
+        //ship sunk
+        alert("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!");
+    }
+}
+
 function fireMissileOnClick() {
     var ships = otherPlayer["shipPlacement"];    
     var cellNum = this.id.split("cell")[1];
     var shipType = determineShipType(ships, cellNum);
     if (shipType == "") {
         //miss
+        console.log("miss");
+        otherPlayer["cellsHit"].push(cellNum);
         var cell = document.getElementById(this.id);
         cell.className = "cell";
     } else {
-        if (!contains(currentPlayer["shipsHit"], cellNum)) {
-            //hit
-            otherPlayer["shipsHit"].push(cellNum);
-            var cell = document.getElementById(this.id);
-            cell.className = "cell redBackground";
-        }
+        /*
+        a cell thats hit won't have an eventlistener in the next round, so only unhit cells will fire this code.
+        */
+        console.log("hit");
+        document.getElementById(this.id).className = "cell redBackground";
+        var ships = otherPlayer["shipsHit"];
+        otherPlayer["shipsHit"][shipType].push(cellNum);
+        checkShipSunk(ships, cellNum);
     }
 }
 
@@ -174,11 +189,18 @@ function generateTopGrid() {
                 p.appendChild(node);
                 cellDiv.appendChild(p); 
                 var cellNum = ((row-1)*10+(col));
-                var className = "";
+                var className = "cell blueBackground";
                 cellDiv.id = otherPlayer["playerNum"] + "cell" + cellNum;
-                className = "cell" + ((contains(otherPlayer["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
+                if (contains(otherPlayer["shipsHit"], cellNum)) {
+                    className = className + " redBackground";
+                } else if (contains(otherPlayer["cellsHit"], cellNum)) {
+                    className = "cell"
+                }
+                if (className == "cell" || className == "cell blueBackground") {
+                    cellDiv.addEventListener("click", fireMissileOnClick);
+                }
                 cellDiv.className = className;
-                cellDiv.addEventListener("click", fireMissileOnClick);
+                
             }        
             rowDiv.appendChild(cellDiv);
         }
@@ -253,8 +275,8 @@ function getInfo(playerNum) {
         return null;
     }
     if (playerNum == 1) {
-        player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":[]};
+        player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{}, "cellsHit":[]};
     } else {
-        player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":[]};
+        player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{}, "cellsHit":[]};
     }
 }
