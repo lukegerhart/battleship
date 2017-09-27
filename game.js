@@ -215,6 +215,7 @@ function fireMissileOnClick() {
 		.catch(failureCallback);*/
         alert2('Hit', 50).then(function() {
             return new Promise ((resolve, reject) => {
+                //check if a ship was sunk
                 var hitsPerShip = {'A':5, 'B':4, 'S':3};
                 var shipName = {'A':'Aircraft Carrier', 'B':'Battleship', 'S':'Submarine'};
                 var shipType = determineShipType(ships, cellNum);
@@ -230,6 +231,14 @@ function fireMissileOnClick() {
 		//checkShipSunk(ships, cellNum);
 		//document.dispatchEvent(blankScreenEvent);
     }
+}
+
+function contains2(obj, cellNum) {
+    for (var key in obj) {
+        var doesContain = contains(obj[key], cellNum);
+        if (doesContain) return true;
+    }
+    return false;
 }
 
 function generateGrids() {
@@ -280,7 +289,7 @@ function generateTopGrid() {
                 var cellNum = ((row-1)*10+(col));
                 var className = "cell blueBackground";
                 cellDiv.id = otherPlayer["playerNum"] + "cell" + cellNum;
-                if (contains(otherPlayer["shipsHit"], cellNum)) {
+                if (contains2(otherPlayer["shipsHit"], cellNum)) {
                     className = className + " redBackground";
                     console.log(className);
                 } else if (contains(otherPlayer["cellsHit"], cellNum)) {
@@ -334,7 +343,7 @@ function generateBottomGrid() {
                 var cellNum = ((row-1)*10+(col));
                 var className = "";
                 cellDiv.id = currentPlayer["playerNum"] + "cell" + cellNum;
-                className = "cell" + ((contains(currentPlayer["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
+                className = "cell" + ((contains2(currentPlayer["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
                 cellDiv.className = className;
                 //Label ship type
                 var ships = currentPlayer["shipPlacement"];
