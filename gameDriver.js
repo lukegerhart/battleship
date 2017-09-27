@@ -13,6 +13,4 @@ while (player2Info == null) {
 var player2 = {"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":[52]};*/
 currentPlayer = player2Info;
 otherPlayer = player1Info;
-generateTopGrid();
-//currentPlayer = player1Info;
-generateBottomGrid();
+generateGrids();

@@ -3,6 +3,44 @@ var player2Info = /*{"name": "Bob", "playerNum": "playerNum2", "shipPlacement": 
 var currentPlayer = {};
 var otherPlayer = {};
 
+function alert2(str, time){
+	return new Promise ((resolve, reject) => {
+		setTimeout(function(){
+            if (confirm(str)) {
+                //resolve actually calls blankScreenAfterTurn, this promise enforces order
+                resolve();
+            } else {
+                reject('');
+            }
+        }, time);
+	});
+}
+
+function alertNextTurn() {
+	alert2(otherPlayer['name'] + ', click okay to start your turn');
+}
+
+var alertNextTurnEvent = new Event('nextTurn');
+document.addEventListener('nextTurn', alertNextTurn);
+
+function blankScreenAfterTurn() {
+	
+	return new Promise((resolve, reject) => {
+		console.log('blanking screen');
+		var body = document.getElementById('mainContainer');
+		body.innerHTML = '';
+        if (document.getElementById('mainContainer').innerHTML == '') {
+            resolve(otherPlayer['name'] + ', click okay to start your turn', 50);
+        } else {
+            reject(otherPlayer['name'] + ', click okay to start your turn', 50);
+        }
+	});
+}
+
+var blankScreenEvent = new Event('blankScreen');
+document.addEventListener('blankScreen', blankScreenAfterTurn);
+
+
 function validateShipPlacement(ships) {    
     if (ships == null) {
         return false;
@@ -136,8 +174,13 @@ function checkShipSunk(ships, cellNum) {
     var hits = hitsPerShip[shipType];
     if (otherPlayer["shipsHit"][shipType].length == hits) {
         //ship sunk
-        alert("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!");
+        alert2("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!");
     }
+}
+
+function failureCallback() {
+	//do nothing
+	console.log("failure");
 }
 
 function fireMissileOnClick() {
@@ -146,10 +189,17 @@ function fireMissileOnClick() {
     var shipType = determineShipType(ships, cellNum);
     if (shipType == "") {
         //miss
-        console.log("miss");
         otherPlayer["cellsHit"].push(cellNum);
         var cell = document.getElementById(this.id);
         cell.className = "cell";
+		/*alert2("miss", 50).then(blankScreenAfterTurn())
+		.then(alert2(otherPlayer['name'] + ', click okay to start your turn', 50))
+		//.then(generateGrids())
+		.catch(failureCallback);*/
+		alert2('Miss', 50).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids).catch(failureCallback);
+		//blankScreenAfterTurn();
+		
+		//document.dispatchEvent(blankScreenEvent);
     } else {
         /*
         a cell thats hit won't have an eventlistener in the next round, so only unhit cells will fire this code.
@@ -158,13 +208,47 @@ function fireMissileOnClick() {
         document.getElementById(this.id).className = "cell redBackground";
         var ships = otherPlayer["shipsHit"];
         otherPlayer["shipsHit"][shipType].push(cellNum);
-        checkShipSunk(ships, cellNum);
+        /*alert2("hit", 50)
+		.then(blankScreenAfterTurn())
+		.then(alert2(otherPlayer['name'] + ', click okay to start your turn', 50))
+		.then(generateGrids())
+		.catch(failureCallback);*/
+        alert2('Hit', 50).then(function() {
+            return new Promise ((resolve, reject) => {
+                var hitsPerShip = {'A':5, 'B':4, 'S':3};
+                var shipName = {'A':'Aircraft Carrier', 'B':'Battleship', 'S':'Submarine'};
+                var shipType = determineShipType(ships, cellNum);
+                var hits = hitsPerShip[shipType];
+                if (otherPlayer["shipsHit"][shipType].length == hits) {
+                    //ship sunk
+                    return alert2("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!", 50).then(blankScreenAfterTurn, blankScreenAfterTurn);
+                }
+                resolve();
+            }
+        );
+        }).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids);
+		//checkShipSunk(ships, cellNum);
+		//document.dispatchEvent(blankScreenEvent);
     }
+}
+
+function generateGrids() {
+	//switch players
+	if (currentPlayer == player1Info) {
+		currentPlayer = player2Info;
+		otherPlayer = player1Info;
+	} else {
+		currentPlayer = player1Info;
+		otherPlayer = player2Info;
+	}
+	
+	generateTopGrid();
+	generateBottomGrid();
 }
 
 function generateTopGrid() {
     var numToString = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-    var body = document.body;
+    var body = document.getElementById("mainContainer");
     var container = document.createElement("div");
     var gridDiv = document.createElement("div");
     gridDiv.className = "topGrid";  
@@ -198,6 +282,7 @@ function generateTopGrid() {
                 cellDiv.id = otherPlayer["playerNum"] + "cell" + cellNum;
                 if (contains(otherPlayer["shipsHit"], cellNum)) {
                     className = className + " redBackground";
+                    console.log(className);
                 } else if (contains(otherPlayer["cellsHit"], cellNum)) {
                     className = "cell"
                 }
@@ -217,7 +302,7 @@ function generateTopGrid() {
 
 function generateBottomGrid() {
     var numToString = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-    var body = document.body;
+    var body = document.getElementById("mainContainer");
     var container = document.createElement("div");
     var gridDiv = document.createElement("div");
     gridDiv.className = "bottomGrid";
@@ -277,11 +362,17 @@ function getInfo(playerNum) {
     var shipPlacements = parseShipPlacement(shipPlacement);
     var shipPlacementGrid = convertShipPlacementToGrid(shipPlacements);
     if (!validateShipPlacement(shipPlacementGrid)) {
-        return null;
-    }
-    if (playerNum == 1) {
-        player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
+        if (playerNum == 1) {
+			player1Info = null;
+		} else {
+			player2Info = null;
+		}
     } else {
-        player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
-    }
+		if (playerNum == 1) {
+			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
+		} else {
+			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
+		}
+	}
+    
 }
