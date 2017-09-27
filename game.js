@@ -25,13 +25,16 @@ document.addEventListener('nextTurn', alertNextTurn);
 
 function blankScreenAfterTurn() {
 	
-	//return new Promise((resolve, reject) => {
-		console.log("blanking screen");
-		var body = document.getElementById("mainContainer");
-		body.innerHTML = "";
-
-		//resolve();
-	//});
+	return new Promise((resolve, reject) => {
+		console.log('blanking screen');
+		var body = document.getElementById('mainContainer');
+		body.innerHTML = '';
+        if (document.getElementById('mainContainer').innerHTML == '') {
+            resolve(otherPlayer['name'] + ', click okay to start your turn', 50);
+        } else {
+            reject(otherPlayer['name'] + ', click okay to start your turn', 50);
+        }
+	});
 }
 
 var blankScreenEvent = new Event('blankScreen');
@@ -193,7 +196,7 @@ function fireMissileOnClick() {
 		.then(alert2(otherPlayer['name'] + ', click okay to start your turn', 50))
 		//.then(generateGrids())
 		.catch(failureCallback);*/
-		alert2('Miss', 50).then(blankScreenAfterTurn, blankScreenAfterTurn);
+		alert2('Miss', 50).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids).catch(failureCallback);
 		//blankScreenAfterTurn();
 		
 		//document.dispatchEvent(blankScreenEvent);
@@ -223,7 +226,7 @@ function fireMissileOnClick() {
                 resolve();
             }
         );
-        }).then(blankScreenAfterTurn, blankScreenAfterTurn);
+        }).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids);
 		//checkShipSunk(ships, cellNum);
 		//document.dispatchEvent(blankScreenEvent);
     }
@@ -279,10 +282,11 @@ function generateTopGrid() {
                 cellDiv.id = otherPlayer["playerNum"] + "cell" + cellNum;
                 if (contains(otherPlayer["shipsHit"], cellNum)) {
                     className = className + " redBackground";
+                    console.log(className);
                 } else if (contains(otherPlayer["cellsHit"], cellNum)) {
                     className = "cell"
                 }
-                if (/*className == "cell" || */className == "cell blueBackground") {
+                if (className == "cell" || className == "cell blueBackground") {
                     cellDiv.addEventListener("click", fireMissileOnClick);
                 }
                 cellDiv.className = className;
