@@ -4,7 +4,7 @@ var currentPlayer = {};
 var otherPlayer = {};
 
 function alert2(str, time){
-	return new Promise ((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		setTimeout(function(){
             if (confirm(str)) {
                 //resolve actually calls blankScreenAfterTurn, this promise enforces order
@@ -381,9 +381,9 @@ function getInfo(playerNum) {
 		}
     } else {
 		if (playerNum == 1) {
-			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
+			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
 		} else {
-			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
+			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
 		}
 	}
     
