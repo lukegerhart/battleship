@@ -344,6 +344,9 @@ function generateBottomGrid() {
                 var className = "";
                 cellDiv.id = currentPlayer["playerNum"] + "cell" + cellNum;
                 className = "cell" + ((contains2(currentPlayer["shipsHit"], cellNum)) ? " redBackground" : " blueBackground");
+                if (contains(currentPlayer["cellsHit"], cellNum)) {
+                    className = "cell";
+                }
                 cellDiv.className = className;
                 //Label ship type
                 var ships = currentPlayer["shipPlacement"];
