@@ -4,10 +4,16 @@ var currentPlayer = {};
 var otherPlayer = {};
 
 function alert2(str, time){
-	//return new Promise ((resolve, reject) => {
-		setTimeout(function(){confirm(str);}, time);
-		//resolve();
-	//});
+	return new Promise ((resolve, reject) => {
+		setTimeout(function(){
+            if (confirm(str)) {
+                //resolve actually calls blankScreenAfterTurn, this promise enforces order
+                resolve();
+            } else {
+                reject('');
+            }
+        }, time);
+	});
 }
 
 function alertNextTurn() {
@@ -187,7 +193,7 @@ function fireMissileOnClick() {
 		.then(alert2(otherPlayer['name'] + ', click okay to start your turn', 50))
 		//.then(generateGrids())
 		.catch(failureCallback);*/
-		confirm("Miss");
+		alert2('Miss', 50).then(blankScreenAfterTurn, blankScreenAfterTurn);
 		//blankScreenAfterTurn();
 		
 		//document.dispatchEvent(blankScreenEvent);
@@ -199,11 +205,25 @@ function fireMissileOnClick() {
         document.getElementById(this.id).className = "cell redBackground";
         var ships = otherPlayer["shipsHit"];
         otherPlayer["shipsHit"][shipType].push(cellNum);
-        alert2("hit", 50)
+        /*alert2("hit", 50)
 		.then(blankScreenAfterTurn())
 		.then(alert2(otherPlayer['name'] + ', click okay to start your turn', 50))
 		.then(generateGrids())
-		.catch(failureCallback);
+		.catch(failureCallback);*/
+        alert2('Hit', 50).then(function() {
+            return new Promise ((resolve, reject) => {
+                var hitsPerShip = {'A':5, 'B':4, 'S':3};
+                var shipName = {'A':'Aircraft Carrier', 'B':'Battleship', 'S':'Submarine'};
+                var shipType = determineShipType(ships, cellNum);
+                var hits = hitsPerShip[shipType];
+                if (otherPlayer["shipsHit"][shipType].length == hits) {
+                    //ship sunk
+                    return alert2("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!", 50).then(blankScreenAfterTurn, blankScreenAfterTurn);
+                }
+                resolve();
+            }
+        );
+        }).then(blankScreenAfterTurn, blankScreenAfterTurn);
 		//checkShipSunk(ships, cellNum);
 		//document.dispatchEvent(blankScreenEvent);
     }
