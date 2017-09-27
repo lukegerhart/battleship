@@ -222,12 +222,15 @@ function fireMissileOnClick() {
                 var hits = hitsPerShip[shipType];
                 if (otherPlayer["shipsHit"][shipType].length == hits) {
                     //ship sunk
-                    return alert2("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!", 50).then(blankScreenAfterTurn, blankScreenAfterTurn);
+                    return alert2("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!", 50)
+                        .then(blankScreenAfterTurn, blankScreenAfterTurn)
+                        .then(alert2, alert2)
+                        .then(generateGrids, generateGrids);
                 }
                 resolve();
             }
         );
-        }).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids);
+        }).then(blankScreenAfterTurn, failureCallback).then(alert2, alert2).then(generateGrids, generateGrids);
 		//checkShipSunk(ships, cellNum);
 		//document.dispatchEvent(blankScreenEvent);
     }
