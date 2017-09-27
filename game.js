@@ -1,5 +1,5 @@
-var player1Info = {"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
-var player2Info = {"name": "Bob", "playerNum": "playerNum2", "shipPlacement": {'B': [47, 57, 67, 77], 'S': [92, 93, 94], 'A': [23, 24, 25, 26, 27]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
+var player1Info = /*{"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]}*/null;
+var player2Info = /*{"name": "Bob", "playerNum": "playerNum2", "shipPlacement": {'B': [47, 57, 67, 77], 'S': [92, 93, 94], 'A': [23, 24, 25, 26, 27]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]}*/null;
 var currentPlayer = {};
 var otherPlayer = {};
 
@@ -27,9 +27,9 @@ function convertShipPlacementToGrid(placementArray) {
     var letterMap = {'A':1, 'B':2, 'C':3, 'D':4, 'E':5, 'F':6, 'G':7, 'H':8, 'I':9, 'J':10};
     var ships = {};
     for (var i = 0; i < placementArray.length; i++) {
-        var location = placementArray[i];
-        var shipType = location.substring(0,1);
-		var locations = location.substring(1).split("-");
+        var loc = placementArray[i];
+        var shipType = loc.substring(0,1);
+		var locations = loc.substring(1).split("-");
         var startCoord = locations[0];
         var endCoord = locations[1];
         var startsMatch = startCoord.charAt(0) == endCoord.charAt(0);
@@ -91,23 +91,28 @@ function determineShipType(ships, cellNum) {
 
 function parseShipPlacement(placementStr) {
     //This regexp matches acceptable input for ship placement. Regexp does not check that the placement is valid(i.e. 4-cell submarine is allowed)
-    /* var shipPlacementRegex = new RegExp('[ABS][:(][A-J](?:[1-9]|10)-[A-J](?:[1-9]|10)[)]?;?', 'g');
+    var shipPlacementRegex = new RegExp('[ABS][:(][A-J](?:[1-9]|10)-[A-J](?:[1-9]|10)[)]?;?', 'g');
     placementStr = placementStr.replace(/\s+/g, '');
+	
 	//document.write(placementStr);
     var ships = [];
     var matches;
     while ((matches = shipPlacementRegex.exec(placementStr)) != null) {
-		document.write(matches[0]);
-        ships.push(matches[0]);
-    } */
+		//document.write(matches[0]);
+		var match = matches[0];
+		if (match.charAt(match.length-1) == ";") {
+			match = match.substring(0,match.length-1);
+		}
+		match = match.replace(/\(|\)/g, '');
+        ships.push(match);
+    }
+	console.log(ships);
     if (placementStr == null) {
         return null;
     }
-	var ships = [];
+	/*var ships = [];
 	placementStr = placementStr.replace(/\s+/g, '');
-	if (placementStr.charAt(placementStr.length-1) == ";") {
-		placementStr = placementStr.substring(0,placementStr.length-1);
-	}
+	
 	ships = placementStr.split(";");
 	if (ships.length != 3) {
         return null;
@@ -120,7 +125,7 @@ function parseShipPlacement(placementStr) {
         if ( !contains(['A', 'B', 'S'], ships[i].charAt(0))) {
             return null;
         }
-	}
+	}*/
     return ships;
 }
 
@@ -275,8 +280,8 @@ function getInfo(playerNum) {
         return null;
     }
     if (playerNum == 1) {
-        player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{}, "cellsHit":[]};
+        player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
     } else {
-        player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{}, "cellsHit":[]};
+        player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]};
     }
 }
