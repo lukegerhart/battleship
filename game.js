@@ -213,14 +213,19 @@ Array.prototype.sortOnValue = function(key){
 function sortLocal() { 
     var localStorageArray = new Array();
     for (i=0;i<localStorage.length;i++){
-        localStorageArray[i] = localStorage.key(i)+localStorage.getItem(localStorage.key(i));
+        localStorageArray[i] = {'key':localStorage.key(i), 'value':localStorage.getItem(localStorage.key(i))};
     }
-    return localStorageArray.sortOnValue("value");
+    console.log(localStorageArray);
+    localStorageArray.sortOnValue("value");
+    console.log(localStorageArray);
+    for (i=0;i<localStorage.length;i++){
+        localStorage.setItem(localStorageArray[i]['key'], localStorageArray[i]['value']);
+    }
 }
 
 function saveHiscore() {
     var score = calcScore();
-    sortLocal();
+    //sortLocal();
     if (all24()) {
         return;
     }
@@ -240,6 +245,7 @@ function saveHiscore() {
         if (score > min) {
             localStorage.removeItem(minKey);
             localStorage.setItem(currentPlayer["name"], score);
+            sortLocal();
         }
     }
     
@@ -439,7 +445,7 @@ function getInfo(playerNum) {
 		if (playerNum == 1) {
 			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[52, 53, 54, 55], 'S':[28, 29]}, "cellsHit":[]};
 		} else {
-			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
+			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[], 'S':[]}, "cellsHit":[]};
 		}
 	}
     
