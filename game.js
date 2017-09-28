@@ -1,5 +1,5 @@
-var player1Info = /*{"name": "Alice", "playerNum": "playerNum1", "shipPlacement": {'B': [52, 53, 54, 55], 'S': [28, 29, 30], 'A': [1, 11, 21, 31, 41]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]}*/null;
-var player2Info = /*{"name": "Bob", "playerNum": "playerNum2", "shipPlacement": {'B': [47, 57, 67, 77], 'S': [92, 93, 94], 'A': [23, 24, 25, 26, 27]}, "shipsHit":{'A':[], 'B':[], 'C':[]}, "cellsHit":[]}*/null;
+var player1Info = null;
+var player2Info = null;
 var currentPlayer = {};
 var otherPlayer = {};
 
@@ -124,7 +124,6 @@ function parseShipPlacement(placementStr) {
     var ships = [];
     var matches;
     while ((matches = shipPlacementRegex.exec(placementStr)) != null) {
-		//document.write(matches[0]);
 		var match = matches[0];
 		if (match.charAt(match.length-1) == ";") {
 			match = match.substring(0,match.length-1);
@@ -135,10 +134,6 @@ function parseShipPlacement(placementStr) {
     if (placementStr == null) {
         return null;
     }
-	/*var ships = [];
-	placementStr = placementStr.replace(/\s+/g, '');
-	
-	ships = placementStr.split(";");
 	if (ships.length != 3) {
         return null;
     }
@@ -150,7 +145,7 @@ function parseShipPlacement(placementStr) {
         if ( !contains(['A', 'B', 'S'], ships[i].charAt(0))) {
             return null;
         }
-	}*/
+	}
     return ships;
 }
 
@@ -443,9 +438,9 @@ function getInfo(playerNum) {
 		}
     } else {
 		if (playerNum == 1) {
-			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[52, 53, 54, 55], 'S':[28, 29]}, "cellsHit":[]};
+			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
 		} else {
-			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[], 'S':[]}, "cellsHit":[]};
+			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
 		}
 	}
     
