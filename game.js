@@ -332,7 +332,7 @@ function generateTopGrid() {
                 } else if (contains(otherPlayer["cellsHit"], cellNum)) {
                     className = "cell"
                 }
-                if (className == "cell" || className == "cell blueBackground") {
+                if (/*className == "cell" || */className == "cell blueBackground") {
                     cellDiv.addEventListener("click", fireMissileOnClick);
                 }
                 cellDiv.className = className;
