@@ -3,6 +3,14 @@ var player2Info = /*{"name": "Bob", "playerNum": "playerNum2", "shipPlacement": 
 var currentPlayer = {};
 var otherPlayer = {};
 
+
+function gameOver() {
+    console.log('game over');
+}
+
+var gameOverEvent = new Event('gameOver');
+document.addEventListener('gameOver', gameOver);
+
 function alert2(str, time){
 	return new Promise((resolve, reject) => {
 		setTimeout(function(){
@@ -10,7 +18,7 @@ function alert2(str, time){
                 //resolve actually calls blankScreenAfterTurn, this promise enforces order
                 resolve();
             } else {
-                reject('');
+                resolve();
             }
         }, time);
 	});
@@ -183,6 +191,28 @@ function failureCallback() {
 	console.log("failure");
 }
 
+function checkIfWon() {
+    return new Promise((resolve, reject) => {
+        var totalHitsOnShips = 0;
+        for (var key in otherPlayer["shipsHit"]) {
+            totalHitsOnShips = totalHitsOnShips + otherPlayer["shipsHit"][key].length;
+        }
+        if (totalHitsOnShips == 12) {
+            //current player is winner
+            //reject();
+            throw new Error("player has won");
+            //return null;
+        } else {
+            //continue game as normal
+            resolve();
+        }
+    });
+}
+
+function announceWinner() {
+    //document.dispatchEvent(gameOverEvent);
+}
+
 function fireMissileOnClick() {
     var ships = otherPlayer["shipPlacement"];    
     var cellNum = this.id.split("cell")[1];
@@ -223,14 +253,18 @@ function fireMissileOnClick() {
                 if (otherPlayer["shipsHit"][shipType].length == hits) {
                     //ship sunk
                     return alert2("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!", 50)
-                        .then(blankScreenAfterTurn, blankScreenAfterTurn)
-                        .then(alert2, alert2)
-                        .then(generateGrids, generateGrids);
+                        .then(checkIfWon, checkIfWon)
+                        .then(blankScreenAfterTurn)
+                        .then(alert2)
+                        .then(generateGrids)
+                        .catch(() => {
+                            console.log("game over");
+                        });
                 }
                 resolve();
             }
         );
-        }).then(blankScreenAfterTurn, failureCallback).then(alert2, alert2).then(generateGrids, generateGrids);
+        }).then(blankScreenAfterTurn, blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids);
 		//checkShipSunk(ships, cellNum);
 		//document.dispatchEvent(blankScreenEvent);
     }
@@ -384,7 +418,7 @@ function getInfo(playerNum) {
 		}
     } else {
 		if (playerNum == 1) {
-			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
+			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[52, 53, 54, 55], 'S':[]}, "cellsHit":[]};
 		} else {
 			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
 		}
