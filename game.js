@@ -172,15 +172,58 @@ function checkIfWon() {
     });
 }
 
+function calcScore() {
+    var totalHitsOnShips = 0;
+    for (var key in currentPlayer["shipsHit"]) {
+        totalHitsOnShips = totalHitsOnShips + currentPlayer["shipsHit"][key].length;
+    }
+    var score = 24 - 2 * totalHitsOnShips;
+    return score;
+}
+
 function calculateScore() {
     return new Promise((resolve, reject) => {
-        var totalHitsOnShips = 0;
-        for (var key in currentPlayer["shipsHit"]) {
-            totalHitsOnShips = totalHitsOnShips + currentPlayer["shipsHit"][key].length;
-        }
-        var score = 24 - 2 * totalHitsOnShips;
-        resolve(currentPlayer["name"] + "'s score is: " + sore, 50);
+        var score = calcScore();
+        resolve(currentPlayer["name"] + "'s score is: " + score, 50);
     });
+}
+
+function all24() {
+    if (localStorage.length != 10) {
+        return false;
+    }
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (localStorage.getItem(key) != 24) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function saveHiscore() {
+    var score = calcScore();
+    if (all24()) {
+        return;
+    }
+    if (localStorage.length < 10) {
+        localStorage.setItem(currentPlayer["name"], score);
+        
+    } else if (localStorage.length == 10) {
+        var min = 25;
+        var minKey = "";
+        for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (localStorage.getItem(key) < min) {
+                min = localStorage.getItem(key);
+                minKey = key;
+            }
+        }
+        if (score > min) {
+            localStorage.removeItem(minKey);
+            localStorage.setItem(currentPlayer["name"], score);
+        }
+    }
 }
 
 function fireMissileOnClick() {
@@ -192,7 +235,7 @@ function fireMissileOnClick() {
         otherPlayer["cellsHit"].push(cellNum);
         var cell = document.getElementById(this.id);
         cell.className = "cell";
-		alert2('Miss', 50).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids).catch(failureCallback);
+		alert2('Miss', 50).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids);
     } else {
         /*
         a cell thats hit won't have an eventlistener in the next round, so only unhit cells will fire this code.
@@ -219,7 +262,8 @@ function fireMissileOnClick() {
                             //score calculation code and stuff here
                             alert2(currentPlayer["name"] + " has won!", 50)
                             .then(calculateScore)
-                            .then(alert2);
+                            .then(alert2)
+                            .then(saveHiscore);
                             
                             console.log("game over");
                         });
@@ -378,7 +422,7 @@ function getInfo(playerNum) {
 		}
     } else {
 		if (playerNum == 1) {
-			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[52, 53, 54, 55], 'S':[]}, "cellsHit":[]};
+			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[52, 53, 54, 55], 'S':[28, 29]}, "cellsHit":[]};
 		} else {
 			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
 		}
