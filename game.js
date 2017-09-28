@@ -19,7 +19,6 @@ function alert2(str, time){
 function blankScreenAfterTurn() {
 	
 	return new Promise((resolve, reject) => {
-		console.log('blanking screen');
 		var body = document.getElementById('mainContainer');
 		body.innerHTML = '';
         if (document.getElementById('mainContainer').innerHTML == '') {
@@ -133,7 +132,6 @@ function parseShipPlacement(placementStr) {
 		match = match.replace(/\(|\)/g, '');
         ships.push(match);
     }
-	console.log(ships);
     if (placementStr == null) {
         return null;
     }
@@ -201,14 +199,34 @@ function all24() {
     return true;
 }
 
+Array.prototype.sortOnValue = function(key){
+    this.sort(function(a, b){
+        if(a[key] < b[key]){
+            return -1;
+        }else if(a[key] > b[key]){
+            return 1;
+        }
+        return 0;
+    });
+}
+
+function sortLocal() { 
+    var localStorageArray = new Array();
+    for (i=0;i<localStorage.length;i++){
+        localStorageArray[i] = localStorage.key(i)+localStorage.getItem(localStorage.key(i));
+    }
+    return localStorageArray.sortOnValue("value");
+}
+
 function saveHiscore() {
     var score = calcScore();
+    sortLocal();
     if (all24()) {
         return;
     }
     if (localStorage.length < 10) {
         localStorage.setItem(currentPlayer["name"], score);
-        
+        sortLocal();
     } else if (localStorage.length == 10) {
         var min = 25;
         var minKey = "";
@@ -224,6 +242,7 @@ function saveHiscore() {
             localStorage.setItem(currentPlayer["name"], score);
         }
     }
+    
 }
 
 function fireMissileOnClick() {
@@ -240,7 +259,6 @@ function fireMissileOnClick() {
         /*
         a cell thats hit won't have an eventlistener in the next round, so only unhit cells will fire this code.
         */
-        console.log("hit");
         document.getElementById(this.id).className = "cell redBackground";
         var ships = otherPlayer["shipsHit"];
         otherPlayer["shipsHit"][shipType].push(cellNum);
@@ -264,8 +282,6 @@ function fireMissileOnClick() {
                             .then(calculateScore)
                             .then(alert2)
                             .then(saveHiscore);
-                            
-                            console.log("game over");
                         });
                 }
                 resolve();
@@ -333,7 +349,6 @@ function generateTopGrid() {
                 cellDiv.id = otherPlayer["playerNum"] + "cell" + cellNum;
                 if (contains2(otherPlayer["shipsHit"], cellNum)) {
                     className = className + " redBackground";
-                    console.log(className);
                 } else if (contains(otherPlayer["cellsHit"], cellNum)) {
                     className = "cell"
                 }
