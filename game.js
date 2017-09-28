@@ -3,14 +3,6 @@ var player2Info = /*{"name": "Bob", "playerNum": "playerNum2", "shipPlacement": 
 var currentPlayer = {};
 var otherPlayer = {};
 
-
-function gameOver() {
-    console.log('game over');
-}
-
-var gameOverEvent = new Event('gameOver');
-document.addEventListener('gameOver', gameOver);
-
 function alert2(str, time){
 	return new Promise((resolve, reject) => {
 		setTimeout(function(){
@@ -23,13 +15,6 @@ function alert2(str, time){
         }, time);
 	});
 }
-
-function alertNextTurn() {
-	alert2(otherPlayer['name'] + ', click okay to start your turn');
-}
-
-var alertNextTurnEvent = new Event('nextTurn');
-document.addEventListener('nextTurn', alertNextTurn);
 
 function blankScreenAfterTurn() {
 	
@@ -44,10 +29,6 @@ function blankScreenAfterTurn() {
         }
 	});
 }
-
-var blankScreenEvent = new Event('blankScreen');
-document.addEventListener('blankScreen', blankScreenAfterTurn);
-
 
 function validateShipPlacement(ships) {    
     if (ships == null) {
@@ -175,22 +156,6 @@ function parseShipPlacement(placementStr) {
     return ships;
 }
 
-function checkShipSunk(ships, cellNum) {
-    var hitsPerShip = {'A':5, 'B':4, 'S':3};
-    var shipName = {'A':'Aircraft Carrier', 'B':'Battleship', 'S':'Submarine'};
-    var shipType = determineShipType(ships, cellNum);
-    var hits = hitsPerShip[shipType];
-    if (otherPlayer["shipsHit"][shipType].length == hits) {
-        //ship sunk
-        alert2("You sunk " + otherPlayer["name"] + " 's " + shipName[shipType] + "!");
-    }
-}
-
-function failureCallback() {
-	//do nothing
-	console.log("failure");
-}
-
 function checkIfWon() {
     return new Promise((resolve, reject) => {
         var totalHitsOnShips = 0;
@@ -199,18 +164,12 @@ function checkIfWon() {
         }
         if (totalHitsOnShips == 12) {
             //current player is winner
-            //reject();
             throw new Error("player has won");
-            //return null;
         } else {
             //continue game as normal
             resolve();
         }
     });
-}
-
-function announceWinner() {
-    //document.dispatchEvent(gameOverEvent);
 }
 
 function calculateScore() {
@@ -233,14 +192,7 @@ function fireMissileOnClick() {
         otherPlayer["cellsHit"].push(cellNum);
         var cell = document.getElementById(this.id);
         cell.className = "cell";
-		/*alert2("miss", 50).then(blankScreenAfterTurn())
-		.then(alert2(otherPlayer['name'] + ', click okay to start your turn', 50))
-		//.then(generateGrids())
-		.catch(failureCallback);*/
 		alert2('Miss', 50).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids).catch(failureCallback);
-		//blankScreenAfterTurn();
-		
-		//document.dispatchEvent(blankScreenEvent);
     } else {
         /*
         a cell thats hit won't have an eventlistener in the next round, so only unhit cells will fire this code.
@@ -249,11 +201,6 @@ function fireMissileOnClick() {
         document.getElementById(this.id).className = "cell redBackground";
         var ships = otherPlayer["shipsHit"];
         otherPlayer["shipsHit"][shipType].push(cellNum);
-        /*alert2("hit", 50)
-		.then(blankScreenAfterTurn())
-		.then(alert2(otherPlayer['name'] + ', click okay to start your turn', 50))
-		.then(generateGrids())
-		.catch(failureCallback);*/
         alert2('Hit', 50).then(function() {
             return new Promise ((resolve, reject) => {
                 //check if a ship was sunk
@@ -281,8 +228,6 @@ function fireMissileOnClick() {
             }
         );
         }).then(blankScreenAfterTurn, blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids);
-		//checkShipSunk(ships, cellNum);
-		//document.dispatchEvent(blankScreenEvent);
     }
 }
 
@@ -348,11 +293,10 @@ function generateTopGrid() {
                 } else if (contains(otherPlayer["cellsHit"], cellNum)) {
                     className = "cell"
                 }
-                if (/*className == "cell" || */className == "cell blueBackground") {
+                if (className == "cell blueBackground") {
                     cellDiv.addEventListener("click", fireMissileOnClick);
                 }
-                cellDiv.className = className;
-                
+                cellDiv.className = className;                
             }        
             rowDiv.appendChild(cellDiv);
         }
