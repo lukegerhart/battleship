@@ -213,6 +213,17 @@ function announceWinner() {
     //document.dispatchEvent(gameOverEvent);
 }
 
+function calculateScore() {
+    return new Promise((resolve, reject) => {
+        var totalHitsOnShips = 0;
+        for (var key in currentPlayer["shipsHit"]) {
+            totalHitsOnShips = totalHitsOnShips + currentPlayer["shipsHit"][key].length;
+        }
+        var score = 24 - 2 * totalHitsOnShips;
+        resolve(currentPlayer["name"] + "'s score is: " + sore, 50);
+    });
+}
+
 function fireMissileOnClick() {
     var ships = otherPlayer["shipPlacement"];    
     var cellNum = this.id.split("cell")[1];
@@ -258,6 +269,11 @@ function fireMissileOnClick() {
                         .then(alert2)
                         .then(generateGrids)
                         .catch(() => {
+                            //score calculation code and stuff here
+                            alert2(currentPlayer["name"] + " has won!", 50)
+                            .then(calculateScore)
+                            .then(alert2);
+                            
                             console.log("game over");
                         });
                 }
