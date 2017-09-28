@@ -19,7 +19,6 @@ function alert2(str, time){
 function blankScreenAfterTurn() {
 	
 	return new Promise((resolve, reject) => {
-		console.log('blanking screen');
 		var body = document.getElementById('mainContainer');
 		body.innerHTML = '';
         if (document.getElementById('mainContainer').innerHTML == '') {
@@ -133,7 +132,6 @@ function parseShipPlacement(placementStr) {
 		match = match.replace(/\(|\)/g, '');
         ships.push(match);
     }
-	console.log(ships);
     if (placementStr == null) {
         return null;
     }
@@ -172,15 +170,85 @@ function checkIfWon() {
     });
 }
 
+function calcScore() {
+    var totalHitsOnShips = 0;
+    for (var key in currentPlayer["shipsHit"]) {
+        totalHitsOnShips = totalHitsOnShips + currentPlayer["shipsHit"][key].length;
+    }
+    var score = 24 - 2 * totalHitsOnShips;
+    return score;
+}
+
 function calculateScore() {
     return new Promise((resolve, reject) => {
-        var totalHitsOnShips = 0;
-        for (var key in currentPlayer["shipsHit"]) {
-            totalHitsOnShips = totalHitsOnShips + currentPlayer["shipsHit"][key].length;
-        }
-        var score = 24 - 2 * totalHitsOnShips;
-        resolve(currentPlayer["name"] + "'s score is: " + sore, 50);
+        var score = calcScore();
+        resolve(currentPlayer["name"] + "'s score is: " + score, 50);
     });
+}
+
+function all24() {
+    if (localStorage.length != 10) {
+        return false;
+    }
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (localStorage.getItem(key) != 24) {
+            return false;
+        }
+    }
+    return true;
+}
+
+Array.prototype.sortOnValue = function(key){
+    this.sort(function(a, b){
+        if(a[key] < b[key]){
+            return -1;
+        }else if(a[key] > b[key]){
+            return 1;
+        }
+        return 0;
+    });
+}
+
+function sortLocal() { 
+    var localStorageArray = new Array();
+    for (i=0;i<localStorage.length;i++){
+        localStorageArray[i] = {'key':localStorage.key(i), 'value':localStorage.getItem(localStorage.key(i))};
+    }
+    console.log(localStorageArray);
+    localStorageArray.sortOnValue("value");
+    console.log(localStorageArray);
+    for (i=0;i<localStorage.length;i++){
+        localStorage.setItem(localStorageArray[i]['key'], localStorageArray[i]['value']);
+    }
+}
+
+function saveHiscore() {
+    var score = calcScore();
+    //sortLocal();
+    if (all24()) {
+        return;
+    }
+    if (localStorage.length < 10) {
+        localStorage.setItem(currentPlayer["name"], score);
+        sortLocal();
+    } else if (localStorage.length == 10) {
+        var min = 25;
+        var minKey = "";
+        for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (localStorage.getItem(key) < min) {
+                min = localStorage.getItem(key);
+                minKey = key;
+            }
+        }
+        if (score > min) {
+            localStorage.removeItem(minKey);
+            localStorage.setItem(currentPlayer["name"], score);
+            sortLocal();
+        }
+    }
+    
 }
 
 function fireMissileOnClick() {
@@ -192,12 +260,11 @@ function fireMissileOnClick() {
         otherPlayer["cellsHit"].push(cellNum);
         var cell = document.getElementById(this.id);
         cell.className = "cell";
-		alert2('Miss', 50).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids).catch(failureCallback);
+		alert2('Miss', 50).then(blankScreenAfterTurn).then(alert2, alert2).then(generateGrids, generateGrids);
     } else {
         /*
         a cell thats hit won't have an eventlistener in the next round, so only unhit cells will fire this code.
         */
-        console.log("hit");
         document.getElementById(this.id).className = "cell redBackground";
         var ships = otherPlayer["shipsHit"];
         otherPlayer["shipsHit"][shipType].push(cellNum);
@@ -219,9 +286,8 @@ function fireMissileOnClick() {
                             //score calculation code and stuff here
                             alert2(currentPlayer["name"] + " has won!", 50)
                             .then(calculateScore)
-                            .then(alert2);
-                            
-                            console.log("game over");
+                            .then(alert2)
+                            .then(saveHiscore);
                         });
                 }
                 resolve();
@@ -289,7 +355,6 @@ function generateTopGrid() {
                 cellDiv.id = otherPlayer["playerNum"] + "cell" + cellNum;
                 if (contains2(otherPlayer["shipsHit"], cellNum)) {
                     className = className + " redBackground";
-                    console.log(className);
                 } else if (contains(otherPlayer["cellsHit"], cellNum)) {
                     className = "cell"
                 }
@@ -378,9 +443,9 @@ function getInfo(playerNum) {
 		}
     } else {
 		if (playerNum == 1) {
-			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[52, 53, 54, 55], 'S':[]}, "cellsHit":[]};
+			player1Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[52, 53, 54, 55], 'S':[28, 29]}, "cellsHit":[]};
 		} else {
-			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[], 'B':[], 'S':[]}, "cellsHit":[]};
+			player2Info = {"name": name, "playerNum": "playerNum" + playerNum, "shipPlacement": shipPlacementGrid, "shipsHit":{'A':[1, 11, 21, 31, 41], 'B':[], 'S':[]}, "cellsHit":[]};
 		}
 	}
     
